@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "48865085534",
+    "project_id": "luvitassignment",
+    "storage_bucket": "luvitassignment.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48865085534:android:d692a3b8d0733127338ccf",
+        "android_client_info": {
+          "package_name": "com.ashraf.luvitassignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNYvbaqHsL_HmBQNNQmvxZ9fspIPKeDNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
