@@ -15,59 +15,51 @@ class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-
-      child: Container(
-
-        child: ClipRRect(
-
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.black,
-
-            ),
-//Image.asset("assets/home.png"), Image.asset("assets/location.png"), Image.asset("assets/center.png"), Image.asset("assets/chats.png"), Image.asset("assets/profile.png")
+      height: 120,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        color: Colors.black,
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
+          border: Border.all(color: Colors.grey,width: 0.5)
+      ),
+        //Image.asset("assets/home.png"), Image.asset("assets/location.png"), Image.asset("assets/center.png"), Image.asset("assets/chats.png"), Image.asset("assets/profile.png")
 
 
-            child: Row(
-              children: [
-                navItem(
-                  Image.asset("assets/home.png"),
-                  "홈",
-                  pageIndex == 0,
-                  onTap: () => onTap(0),
-                ),
-                navItem(
-                  Image.asset("assets/location.png"),
-                  "스팟",
-                  pageIndex == 1,
-                  onTap: () => onTap(1),
-                ),
-                const SizedBox(width: 80),
-                navItem(
-                  Image.asset("assets/chats.png"),
-                  "채팅",
-                  pageIndex == 2,
-                  onTap: () => onTap(2),
-                ),
-                navItem(
-                  Image.asset("assets/profile.png"),
-                  "마이",
-                  pageIndex == 3,
-                  onTap: () => onTap(3),
-                ),
-              ],
-            ),
+      child: Row(
+        children: [
+          navItem(
+            Image.asset("assets/home.png"),
+            "홈",
+            pageIndex == 0,
+            onTap: () => onTap(0),
           ),
-        ),
+          navItem(
+            Image.asset("assets/location.png"),
+            "스팟",
+            pageIndex == 1,
+            onTap: () => onTap(1),
+          ),
+          const SizedBox(width: 80),
+          navItem(
+            Image.asset("assets/chats.png"),
+            "채팅",
+            pageIndex == 2,
+            onTap: () => onTap(2),
+          ),
+          navItem(
+            Image.asset("assets/profile.png"),
+            "마이",
+            pageIndex == 3,
+            onTap: () => onTap(3),
+          ),
+        ],
       ),
     );
   }
 
   Widget navItem(Widget icon,String label, bool selected, {Function()? onTap}) {
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
         onTap: onTap,
         child: Column(
           children: [

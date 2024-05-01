@@ -1,10 +1,20 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'NavBar.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+
+// Icons Theek krunga
+// Shadows dunga
+// Apk test krunga real device mien
+// Mail kr dunga apk file
+
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +60,7 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
     super.initState();
     items = [
       NavModel(
-        page: const TabPage(tab: 1),
+        page: MyScrollablePage(),
         navKey: homeNavKey,
       ),
       NavModel(
@@ -95,9 +105,32 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
             ],
           ),
           titleSpacing: 0,
-          title: Text(
-            '목이길어슬픈기린님의 새로운 스팟',style: TextStyle(fontSize: 18),
+          title:RichText(
+
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 12
+              ),
+              children: [
+                TextSpan(
+                  text: '목이길어슬픈기린',
+                  style: TextStyle(color: Colors.white,
+                    fontWeight: FontWeight.bold,), // Style for the first part
+                ),
+                TextSpan(
+                  text: '님의 새로운',
+                  style: TextStyle(
+                    color: Colors.white, // Make the middle part bold
+                  ),
+                ),
+                TextSpan(
+                  text: '스팟',
+                  style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold), // Style for the last part
+                ),
+              ],
+            ),
           ),
+
           actions: [
             Container(
               margin: EdgeInsets.only(right: 12.0),
@@ -451,7 +484,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                             begin: Alignment.bottomCenter,
                                             end: Alignment.topCenter,
                                             colors: [
-                                              Colors.black.withOpacity(0.8), // Black with opacity
+                                              Colors.black.withOpacity(0.98), // Black with opacity
                                               Colors.transparent, // Transparent
                                             ],
                                           ),
@@ -502,44 +535,59 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                                   children: [
                                                     Row(
                                                       children: [
-                                                        Text(users[index].get("name"),style: Theme.of(context).textTheme.headlineMedium,),
+                                                        Text(users[index].get("name"),style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                                                          fontWeight: FontWeight.bold
+                                                        ),),
                                                         Text(" "+users[index].get("age"),style: Theme.of(context).textTheme.headlineMedium,),
                                                       ],
                                                     ),
                                                     Row(
                                                       children: [
                                                         Text(users[index].get("city")+" . "),
-                                                        Text(users[index].get("distance")),
+                                                        Text(users[index].get("distance")+" 거리에 있음"),
                                                       ],
                                                     ),
                                                   ],
                                                 ),
                                                 GestureDetector(
-                                                  onTap: () {
+                                                  onTap: (){
+                                                    isFilled = !isFilled;
                                                     setState(() {
-                                                      isFilled = !isFilled;
+
                                                     });
                                                   },
-                                                  child: Container(
+                                                  child: GradientBorderContainer(
                                                     width: 60,
                                                     height: 60,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      border: Border.all(
-                                                        color: isFilled ? Colors.transparent : Colors.red, // Border color
-                                                        width: 2, // Border width
-                                                      ),
-                                                      color: isFilled ? Colors.red : Colors.transparent, // Fill color
+                                                    fill: isFilled,
+                                                    gradient: LinearGradient(
+                                                      colors: [Color(0xff45FFF4 ),Color(0xff7000FF)],  // Gradient colors
+                                                      begin: Alignment.topLeft,
+                                                      end: Alignment.bottomRight,
                                                     ),
+                                                    borderWidth: 2.0,
                                                     child: Center(
-                                                      child: Icon(
-                                                        Icons.favorite,
-                                                        color: isFilled ? Colors.white : Colors.red, // Heart color
-                                                        size: 25,
+                                                      child: ShaderMask(
+                                                        shaderCallback: (Rect bounds) {
+                                                          return LinearGradient(
+                                                            begin: Alignment.topLeft,
+                                                            end: Alignment.bottomRight,
+                                                            //#45FFF4
+                                                            // #7000FF
+                                                            colors: !isFilled?[Color(0xff45FFF4 ),Color(0xff7000FF)]:[Colors.red,Colors.red], // Gradient colors
+                                                            tileMode: TileMode.mirror,
+                                                          ).createShader(bounds);
+                                                        },
+                                                        child: Icon(
+                                                          Icons.favorite,
+                                                         // color: isFilled ? Color(0xff7000FF) : Colors.transparent, // Heart color
+                                                          size: 30,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                )
+                                                ),
+
                                               ],
                                             ),
                                             // Hidden content
@@ -560,21 +608,30 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                               visible: makeVisible==2,
                                               child: Padding(
                                                 padding: const EdgeInsets.all(8.0),
-                                                child: Wrap(
-                                                  spacing: 8.0,
-                                                  runSpacing: 8.0,
-                                                  children: List.generate(
-                                                    users[index].get("preferences").length, // Number of chips
-                                                        (ink) => Chip(
-                                                      label: Text(users[index].get("preferences")[ink]),
-                                                          backgroundColor: null,
-                                                      labelStyle: TextStyle(
-                                                        color: ink == 0 ? Colors.pink : Colors.grey,
-                                                      ),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(100.0),
-                                                        side: BorderSide(color: ink==0?Colors.pink:Colors.grey, width: 0.5),
-                                                      ),
+                                                child: Theme(
+                                                  data: ThemeData(
+                                                    canvasColor: Colors.transparent,
+                                                    chipTheme: ChipThemeData(
+                                                      backgroundColor: Colors.transparent,
+                                                      color: null
+                                                    ),
+                                                  ),
+                                                  child: Wrap(
+                                                    spacing: 8.0,
+                                                    runSpacing: 8.0,
+                                                    children: List.generate(
+                                                      users[index].get("preferences").length, // Number of chips
+                                                          (ink) => Chip(
+                                                            label: Text(users[index].get("preferences")[ink]),
+                                                          backgroundColor: ink == 0 ?Colors.pink.withAlpha(40):Colors.black,
+                                                            labelStyle: TextStyle(
+                                                          color: ink == 0 ? Colors.pink : Colors.grey,
+                                                                                                                ),
+                                                                                                                shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(100.0),
+                                                          side: BorderSide(color: ink==0?Colors.pink:Colors.grey, width: 0.5),
+                                                                                                                ),
+                                                                                                              ),
                                                     ),
                                                   ),
                                                 ),
@@ -650,6 +707,8 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
       ),
     );
   }
+
+ // GradientBorderContainer({required int width, required int height, required LinearGradient gradient, required double borderWidth, required Center child}) {}
 }
 
 
@@ -696,4 +755,68 @@ class Page extends StatelessWidget {
       body: Center(child: Text('Tab $tab')),
     );
   }
+}
+
+
+class GradientBorderContainer extends StatelessWidget {
+  final Widget child;
+  final double width;
+  final double height;
+  final Gradient gradient;
+  final double borderWidth;
+  final bool fill;
+
+  const GradientBorderContainer({
+    Key? key,
+    required this.child,
+    this.width = 100,
+    this.height = 100,
+    required this.gradient,
+    this.borderWidth = 2.0,
+    this.fill = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(width, height),
+      painter: _GradientBorderPainter(gradient, borderWidth, fill),
+      child: Container(
+        width: width,
+        height: height,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _GradientBorderPainter extends CustomPainter {
+  final Gradient gradient;
+  final double borderWidth;
+  final bool fill;
+
+  _GradientBorderPainter(this.gradient, this.borderWidth, this.fill);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = gradient.createShader(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+      )
+      ..strokeWidth = borderWidth;
+
+    if (fill) {
+      paint.style = PaintingStyle.fill;
+    } else {
+      paint.style = PaintingStyle.stroke;
+    }
+
+    final path = Path()
+      ..addOval(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
