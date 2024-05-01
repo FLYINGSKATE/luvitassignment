@@ -15,16 +15,17 @@ class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
-      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height*0.1,
       decoration: BoxDecoration(
-        color: Colors.black,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
-          border: Border.all(color: Colors.grey,width: 0.5)
+         // border: Border.all(color: Colors.grey,width: 0.3),
+          border: Border(
+            left: BorderSide(color: Colors.grey,width: 0.3),
+            top: BorderSide(color: Colors.grey,width: 0.3),
+            right: BorderSide(color:Colors.grey,width: 0.3),
+          ),
       ),
         //Image.asset("assets/home.png"), Image.asset("assets/location.png"), Image.asset("assets/center.png"), Image.asset("assets/chats.png"), Image.asset("assets/profile.png")
-
-
       child: Row(
         children: [
           navItem(
@@ -66,7 +67,7 @@ class NavBar extends StatelessWidget {
             SizedBox(height: 10,),
             icon,
             SizedBox(height: 10,),
-            selected ?Text(label,style: TextStyle(color: Colors.pink),):Text(label,style: TextStyle(color: Colors.grey),)
+            selected ?Text(label,style: TextStyle(color: Colors.pink),):Text(label,style: TextStyle(color: Colors.white24),)
           ],
         ),
       ),

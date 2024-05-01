@@ -8,14 +8,6 @@ import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-
-// Icons Theek krunga
-// Shadows dunga
-// Apk test krunga real device mien
-// Mail kr dunga apk file
-
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -118,7 +110,7 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
                     fontWeight: FontWeight.bold,), // Style for the first part
                 ),
                 TextSpan(
-                  text: '님의 새로운',
+                  text: ' 님의 새로운 ' ,
                   style: TextStyle(
                     color: Colors.white, // Make the middle part bold
                   ),
@@ -202,6 +194,7 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
           ),
         ),
         bottomNavigationBar: NavBar(
+
           pageIndex: selectedTab,
           onTap: (index) {
             if (index == selectedTab) {
@@ -361,6 +354,10 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
 
   bool isFilled = false;
 
+  PageController pageViewController = PageController(
+    viewportFraction: 0.94,initialPage: 1 // Adjust this value to reduce spacing between items
+  );
+
   Future<QuerySnapshot> fetchDataOnce() async {
     // Reference to the Firestore collection
     CollectionReference userDetailsCollection = FirebaseFirestore.instance.collection('Users');
@@ -432,6 +429,9 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
             child: Stack(
               children: [
                 PageView.builder(
+                  pageSnapping: false,
+
+                  controller: pageViewController,
                   itemCount: users.length,
                   itemBuilder: (context, index) {
 
@@ -461,7 +461,8 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                               }
                             },
                             child: Container(
-                              margin: EdgeInsets.all(20.0),
+                              //width: MediaQuery.of(context).size.width * 0.8,
+                              margin: EdgeInsets.symmetric(horizontal: 7.0,vertical: 10),
                               decoration: BoxDecoration(
 
                                 borderRadius: BorderRadius.circular(20.0),
@@ -478,7 +479,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                       child: Container(
 
                                         decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey),
+                                          border: Border.all(color: Colors.grey,width: 0.5),
                                           borderRadius: BorderRadius.circular(20),
                                           gradient: LinearGradient(
                                             begin: Alignment.bottomCenter,
@@ -543,49 +544,53 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                                     ),
                                                     Row(
                                                       children: [
-                                                        Text(users[index].get("city")+" . "),
+                                                        Text(users[index].get("city")+" • "),
                                                         Text(users[index].get("distance")+" 거리에 있음"),
                                                       ],
                                                     ),
                                                   ],
                                                 ),
-                                                GestureDetector(
-                                                  onTap: (){
-                                                    isFilled = !isFilled;
-                                                    setState(() {
+                                                StatefulBuilder(
+                                                  builder: (context,innerState) {
+                                                    return GestureDetector(
+                                                      onTap: (){
+                                                        isFilled = !isFilled;
+                                                        innerState(() {
 
-                                                    });
-                                                  },
-                                                  child: GradientBorderContainer(
-                                                    width: 60,
-                                                    height: 60,
-                                                    fill: isFilled,
-                                                    gradient: LinearGradient(
-                                                      colors: [Color(0xff45FFF4 ),Color(0xff7000FF)],  // Gradient colors
-                                                      begin: Alignment.topLeft,
-                                                      end: Alignment.bottomRight,
-                                                    ),
-                                                    borderWidth: 2.0,
-                                                    child: Center(
-                                                      child: ShaderMask(
-                                                        shaderCallback: (Rect bounds) {
-                                                          return LinearGradient(
-                                                            begin: Alignment.topLeft,
-                                                            end: Alignment.bottomRight,
-                                                            //#45FFF4
-                                                            // #7000FF
-                                                            colors: !isFilled?[Color(0xff45FFF4 ),Color(0xff7000FF)]:[Colors.red,Colors.red], // Gradient colors
-                                                            tileMode: TileMode.mirror,
-                                                          ).createShader(bounds);
-                                                        },
-                                                        child: Icon(
-                                                          Icons.favorite,
-                                                         // color: isFilled ? Color(0xff7000FF) : Colors.transparent, // Heart color
-                                                          size: 30,
+                                                        });
+                                                      },
+                                                      child: GradientBorderContainer(
+                                                        width: 60,
+                                                        height: 60,
+                                                        fill: isFilled,
+                                                        gradient: LinearGradient(
+                                                          colors: [Color(0xff45FFF4 ),Color(0xff7000FF)],  // Gradient colors
+                                                          begin: Alignment.topLeft,
+                                                          end: Alignment.bottomRight,
+                                                        ),
+                                                        borderWidth: 2.0,
+                                                        child: Center(
+                                                          child: ShaderMask(
+                                                            shaderCallback: (Rect bounds) {
+                                                              return LinearGradient(
+                                                                begin: Alignment.topLeft,
+                                                                end: Alignment.bottomRight,
+                                                                //#45FFF4
+                                                                // #7000FF
+                                                                colors: !isFilled?[Color(0xff45FFF4 ),Color(0xff7000FF)]:[Colors.red,Colors.red], // Gradient colors
+                                                                tileMode: TileMode.mirror,
+                                                              ).createShader(bounds);
+                                                            },
+                                                            child: Icon(
+                                                              Icons.favorite,
+                                                             // color: isFilled ? Color(0xff7000FF) : Colors.transparent, // Heart color
+                                                              size: 30,
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ),
+                                                    );
+                                                  }
                                                 ),
 
                                               ],
@@ -679,13 +684,13 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                         int ind = users[index].get("imageUrls").indexOf(img);
                                         return Container(
                                           margin: EdgeInsets.symmetric(horizontal: 4.0),
-                                          width: MediaQuery.of(context).size.width/(users[index].get("imageUrls").length*2),
+                                          width: MediaQuery.of(context).size.width/(users[index].get("imageUrls").length*1.5),
                                           height: 4.0,
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(100),
                                             color: imageIndex == ind
                                                 ? Colors.pink
-                                                : Colors.grey,
+                                                : Colors.black87,
                                           ),
                                         );
                                       }).toList(),
