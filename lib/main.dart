@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
+import 'NavBar.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -36,19 +37,179 @@ class MyBottomNavigation extends StatefulWidget {
 class _MyBottomNavigationState extends State<MyBottomNavigation> {
   int _currentIndex = 0;
 
+
+  final homeNavKey = GlobalKey<NavigatorState>();
+  final searchNavKey = GlobalKey<NavigatorState>();
+  final notificationNavKey = GlobalKey<NavigatorState>();
+  final profileNavKey = GlobalKey<NavigatorState>();
+  int selectedTab = 0;
+  List<NavModel> items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    items = [
+      NavModel(
+        page: const TabPage(tab: 1),
+        navKey: homeNavKey,
+      ),
+      NavModel(
+        page: const TabPage(tab: 2),
+        navKey: searchNavKey,
+      ),
+      NavModel(
+        page: const TabPage(tab: 3),
+        navKey: notificationNavKey,
+      ),
+      NavModel(
+        page: const TabPage(tab: 4),
+        navKey: profileNavKey,
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.location_on),
-          onPressed: () {
-            // Add your location functionality here
+    return WillPopScope(
+      onWillPop: () {
+        if (items[selectedTab].navKey.currentState?.canPop() ?? false) {
+          items[selectedTab].navKey.currentState?.pop();
+          return Future.value(false);
+        } else {
+          return Future.value(true);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          centerTitle: false,
+          backgroundColor: Colors.black,
+          leading: Row(
+            children: [
+              IconButton(
+                icon: Image.asset("assets/locappbar.png"),
+                onPressed: () {
+                  // Add your location functionality here
+                },
+              ),
+            ],
+          ),
+          titleSpacing: 0,
+          title: Text(
+            '목이길어슬픈기린님의 새로운 스팟',style: TextStyle(fontSize: 18),
+          ),
+          actions: [
+            Container(
+              margin: EdgeInsets.only(right: 12.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      // Add your action on the rounded container here
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white24),
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.black,
+                      ),
+                      child: Row(
+                        children: [
+                          Image.asset("assets/starfill.png"),
+                          SizedBox(width: 4.0),
+                          Text(
+                            '323,233',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          SizedBox(width: 4.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Adjust spacing between rounded container and bell icon
+                  IconButton(
+                    icon: Image.asset("assets/bell.png"),
+                    onPressed: () {
+                      // Add your notification functionality here
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        body: IndexedStack(
+          index: selectedTab,
+          children: items
+              .map((page) => Navigator(
+            key: page.navKey,
+            onGenerateInitialRoutes: (navigator, initialRoute) {
+              return [
+                MaterialPageRoute(builder: (context) => page.page)
+              ];
+            },
+          ))
+              .toList(),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Container(
+          margin: const EdgeInsets.only(top: 10),
+          height: 64,
+          width: 64,
+          child: FloatingActionButton(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            onPressed: () => debugPrint("Add Button pressed"),
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(width: 0.5, color: Colors.grey),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Image.asset("assets/center.png",scale: 0.1,),
+          ),
+        ),
+        bottomNavigationBar: NavBar(
+          pageIndex: selectedTab,
+          onTap: (index) {
+            if (index == selectedTab) {
+              items[index]
+                  .navKey
+                  .currentState
+                  ?.popUntil((route) => route.isFirst);
+            } else {
+              setState(() {
+                selectedTab = index;
+              });
+            }
           },
         ),
-        title: Text(
-          '목이길어슬픈기린님의 새로운 스팟',
+      ),
+    );
+  }
 
+
+
+
+  /*@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        centerTitle: false,
+        backgroundColor: Colors.black,
+        leading: Row(
+          children: [
+            IconButton(
+              icon: Image.asset("assets/locappbar.png"),
+              onPressed: () {
+                // Add your location functionality here
+              },
+            ),
+          ],
+        ),
+        titleSpacing: 0,
+        title: Text(
+          '목이길어슬픈기린님의 새로운 스팟',style: TextStyle(fontSize: 18),
         ),
         actions: [
           Container(
@@ -62,23 +223,24 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                     decoration: BoxDecoration(
-
+                      border: Border.all(color: Colors.white24),
                       borderRadius: BorderRadius.circular(20.0),
                       color: Colors.black,
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.star, color: Colors.pink),
+                        Image.asset("assets/starfill.png"),
                         SizedBox(width: 4.0),
                         Text(
                           '323,233',
                           style: TextStyle(color: Colors.white),
                         ),
+                        SizedBox(width: 4.0),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(width: 8.0), // Adjust spacing between rounded container and bell icon
+                 // Adjust spacing between rounded container and bell icon
                 IconButton(
                   icon: Icon(Icons.notifications),
                   onPressed: () {
@@ -95,9 +257,9 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
         tabBarColor: Colors.black,
         tabIconColor: Colors.grey,
         tabIconSelectedColor: Colors.pink,
-        labels: ["Home", "Search", "Favorites", "Notifications", "Profile"],
-        icons: [Icons.home, Icons.search, Icons.favorite, Icons.notifications, Icons.person],
-        initialSelectedTab: "Home",
+        labels: ["홈", "스팟", "", "채팅", "마이"],
+        icons: [Image.asset("assets/home.png"), Image.asset("assets/location.png"), Image.asset("assets/center.png"), Image.asset("assets/chats.png"), Image.asset("assets/profile.png")],
+        initialSelectedTab: "홈",
         //tabAnimationCurve: Curves.easeInOut,
         // tabAnimationDuration: Duration(milliseconds: 600),
         onTabItemSelected: (int index) {
@@ -105,11 +267,11 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
             _currentIndex = index;
           });
         },
-        textStyle: TextStyle(color: Colors.black),
+        textStyle: TextStyle(color: Colors.pink),
       ),
 
     );
-  }
+  }*/
 
   Widget _getBodyWidget(int index) {
     switch (index) {
@@ -158,7 +320,11 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
   ];
   int currentImageIndex = 0;
 
-  bool isExpanded = false;
+  int makeVisible = 0;
+
+
+  int _selectedIndex = -1;
+
 
   bool isFilled = false;
 
@@ -169,7 +335,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
     // Get all documents from the collection
     QuerySnapshot querySnapshot = await userDetailsCollection.get();
 
-    // userDetailsCollection.add(querySnapshot.docs.first.data());
+    //userDetailsCollection.add(querySnapshot.docs.first.data());
 
     return querySnapshot;
   }
@@ -186,12 +352,14 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: Colors.black,
       body : FutureBuilder<QuerySnapshot>(
         future: myFutureUsersData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // Loading indicator while fetching data
+            return Center(child: CircularProgressIndicator(
+              color: Colors.pink,
+            )); // Loading indicator while fetching data
           }
 
           if (snapshot.hasError) {
@@ -277,6 +445,8 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                       child: Container(
 
                                         decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(20),
                                           gradient: LinearGradient(
                                             begin: Alignment.bottomCenter,
                                             end: Alignment.topCenter,
@@ -294,11 +464,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                     alignment: Alignment.bottomLeft,
                                     child: GestureDetector(
                                       onTap: () {
-
                                         // users.first.data();
-
-
-
                                         setState(() {
                                           currentImageIndex =
                                               (currentImageIndex + 1) % images.length;
@@ -316,11 +482,11 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
 
                                                 borderRadius: BorderRadius.circular(20.0),
                                                 color: Colors.black,
-                                              ),width: 115,
+                                              ),width: 100,
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.star, color: Colors.pink),
-                                                  SizedBox(width: 4.0),
+                                                  Image.asset("assets/star.png"),
+                                                  SizedBox(width: 8.0),
                                                   Text(
                                                     '323,233',
                                                     style: TextStyle(color: Colors.white),
@@ -379,7 +545,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                             // Hidden content
                                             AnimatedContainer(
                                               duration: Duration(milliseconds: 300),
-                                              height: isExpanded ? 200 : 0, // Set to 0 to hide initially
+                                              height: makeVisible==1 ? 200 : 0, // Set to 0 to hide initially
                                               child: Center(
                                                 child: Padding(
                                                   padding: const EdgeInsets.all(20.0),
@@ -390,20 +556,52 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                                 ),
                                               ),
                                             ),
+                                            Visibility(
+                                              visible: makeVisible==2,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Wrap(
+                                                  spacing: 8.0,
+                                                  runSpacing: 8.0,
+                                                  children: List.generate(
+                                                    users[index].get("preferences").length, // Number of chips
+                                                        (ink) => Chip(
+                                                      label: Text(users[index].get("preferences")[ink]),
+                                                          backgroundColor: null,
+                                                      labelStyle: TextStyle(
+                                                        color: ink == 0 ? Colors.pink : Colors.grey,
+                                                      ),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(100.0),
+                                                        side: BorderSide(color: ink==0?Colors.pink:Colors.grey, width: 0.5),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                             // Expand button
                                             Center(
                                               child: GestureDetector(
                                                 onTap: () {
+
+                                                  if(makeVisible==2){
+                                                    makeVisible=0;
+                                                  }
+                                                  else{
+                                                    makeVisible++;
+                                                  }
+
                                                   setState(() {
-                                                    isExpanded = !isExpanded;
+
                                                   });
                                                 },
                                                 child: Container(
                                                   height: 50,
 
                                                   child: Icon(
-                                                    isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                                    size: 40,
+                                                    makeVisible==0 ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                                    size: 20,
                                                     color: Colors.white,
                                                   ),
                                                 ),
@@ -415,7 +613,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                     ),
                                   ),
                                   Positioned(
-                                    top: 35.0,
+                                    top: 14.0,
                                     left: 0,
                                     right: 0,
                                     child: Row(
@@ -425,7 +623,7 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
                                         return Container(
                                           margin: EdgeInsets.symmetric(horizontal: 4.0),
                                           width: MediaQuery.of(context).size.width/(users[index].get("imageUrls").length*2),
-                                          height: 7.0,
+                                          height: 4.0,
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(100),
                                             color: imageIndex == ind
@@ -455,3 +653,47 @@ class _MyScrollablePageState extends State<MyScrollablePage> {
 }
 
 
+class TabPage extends StatelessWidget {
+  final int tab;
+
+  const TabPage({Key? key, required this.tab}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Tab $tab')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Tab $tab'),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => Page(tab: tab),
+                  ),
+                );
+              },
+              child: const Text('Go to page'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Page extends StatelessWidget {
+  final int tab;
+
+  const Page({super.key, required this.tab});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Page Tab $tab')),
+      body: Center(child: Text('Tab $tab')),
+    );
+  }
+}
